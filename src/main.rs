@@ -61,17 +61,20 @@ cfg_if! {
             let model_path = env::var("MODEL_PATH").expect("MODEL_PATH must be set");
             let model_parameters = llm::ModelParameters {
                 prefer_mmap: true,
-                context_size: 2048,
+                context_size: 4096,
                 lora_adapters: None,
                 use_gpu: true,
-                gpu_layers: None,
+                gpu_layers: Some(20), //20 for 6_K
                 rope_overrides: None,
                 n_gqa: None,
             };
-
+            //let tokenizer = llm::TokenizerSource::HuggingFaceRemote("meta-llama/Llama-2-7b-chat-hf".to_owned());
+            let tokenizer = llm::TokenizerSource::HuggingFaceRemote("mistralai/Mistral-7B-v0.1".to_owned());
+            //let tokenizer = llm::TokenizerSource::HuggingFaceRemote("deepseek-ai/deepseek-coder-6.7b-instruct".to_owned());
             llm::load::<Llama>(
                 &PathBuf::from(&model_path),
-                llm::TokenizerSource::Embedded,
+                tokenizer,
+                //llm::TokenizerSource::Embedded,
                 model_parameters,
                 llm::load_progress_callback_stdout,
             )

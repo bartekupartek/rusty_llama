@@ -2,14 +2,14 @@ use cfg_if::cfg_if;
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
-        static CHARACTER_NAME: &str = "### Assistant";
-        static USER_NAME: &str = "### Human";
+        static CHARACTER_NAME: &str = "### Response:";
+        static USER_NAME: &str = "### Instruction:";
 
         use std::convert::Infallible;
         use actix_web::web;
         use std::sync::Arc;
         use llm::models::Llama;
-        use llm::KnownModel;
+        use llm::Model;
         use actix_web::HttpRequest;
         use actix_web::HttpResponse;
         use actix_web::web::Payload;
@@ -45,12 +45,17 @@ cfg_if! {
         }
 
         fn session_setup(model: Arc<Llama>) -> llm::InferenceSession {
-            let persona = "A chat between a human and an assistant.";
-            let history = format!(
+            let persona = "You are an AI programming assistant, utilizing the Deepseek Coder model, developed by Deepseek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.";
+/*            let history = format!(
                 "{CHARACTER_NAME}:Hello - How may I help you today?\n\
                 {USER_NAME}:What is the capital of France?\n\
                 {CHARACTER_NAME}:Paris is the capital of France.\n"
-            );
+            );*/
+            let history = format!(
+                "### Instruction: \n
+                Tell me about AI\n
+                ### Response:\n"
+                );
 
             let mut session = model.start_session(Default::default());
             session
